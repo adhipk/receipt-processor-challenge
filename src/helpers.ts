@@ -1,4 +1,4 @@
-import { Receipt,UnverifiedReceipt,Item } from './types.ts';
+import { Item, Receipt, UnverifiedReceipt } from "./types.ts";
 const POINTS = {
   alphanumRetailer: 1,
   AmountRoundNum: 50,
@@ -12,30 +12,29 @@ const POINTS = {
   purchaseTime24: 10,
 };
 
-export function validateReceipt(r:UnverifiedReceipt){
-  
-  if (isNaN(+r.total)){
-    return null
+export function validateReceipt(r: UnverifiedReceipt) {
+  if (isNaN(+r.total)) {
+    return null;
   }
-  const items:Item[] = []
-  for(const item of r.items){
+  const items: Item[] = [];
+  for (const item of r.items) {
     const price = +item.price;
-    if (isNaN(price)){
-      return null
+    if (isNaN(price)) {
+      return null;
     }
-    items.push({...item,price});
+    items.push({ ...item, price });
   }
-   return {
-    retailer:r.retailer,
-    purchaseDate:r.purchaseDate,
-    purchaseTime:r.purchaseTime,
-    total:+r.total,
-    items:items
-}
-
+  return {
+    retailer: r.retailer,
+    purchaseDate: r.purchaseDate,
+    purchaseTime: r.purchaseTime,
+    total: +r.total,
+    items: items,
+  };
 }
 export function calculatePoints(receipt: Receipt) {
   let points = 0;
+
   // retailer alphanumeric length
   points += POINTS.alphanumRetailer *
     receipt.retailer.replace(/[^a-zA-Z0-9]/g, "").length;
@@ -56,8 +55,7 @@ export function calculatePoints(receipt: Receipt) {
   // if trimmed item description length is a multiple of 3
   for (const item of receipt.items) {
     if (item.shortDescription.trim().length % POINTS.itemDescIsMultOf == 0) {
-      
-      points += Math.round(POINTS.itemPriceMultiplier * item.price);
+      points += Math.ceil(POINTS.itemPriceMultiplier * item.price);
     }
   }
 
@@ -77,5 +75,6 @@ export function calculatePoints(receipt: Receipt) {
   ) {
     points += POINTS.purchaseTime24;
   }
+
   return points;
 }

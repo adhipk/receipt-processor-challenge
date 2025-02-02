@@ -1,4 +1,4 @@
-import { Receipt,UnverifiedReceipt } from './types.ts';
+import { Receipt } from './types.ts';
 import { calculatePoints, validateReceipt } from "./helpers.ts";
 import * as crypto from "node:crypto";
 import { Application, Router } from "https://deno.land/x/oak/mod.ts";
@@ -17,9 +17,9 @@ function processReceipt(receipt:Receipt) {
 
 async function getReceiptPoints(id: crypto.UUID) {
   let points = 0;
-  console.log(id);
   const cachedPoints = await kv.get<number>(["receipt", id, "points"]);
   if (cachedPoints.value) {
+    console.log('using cached value');
     return { "points": cachedPoints.value };
   }
   const receiptkv = await kv.get<Receipt>(["receipt", id]);
@@ -28,6 +28,8 @@ async function getReceiptPoints(id: crypto.UUID) {
     // calculate points based on rules provided
     points = calculatePoints(receipt);
   }
+  // store computed points in cache to prevent recalculation
+  kv.set(["receipt", id, "points"],points);
   return { "points": points };
 }
 
