@@ -8,4 +8,4 @@ ADD ./src /app
 
 RUN deno install --entrypoint main.ts
 
-CMD ["run", "--allow-net", "main.ts"]
+CMD ["run", "--allow-net","--unstable-kv", "main.ts"]
